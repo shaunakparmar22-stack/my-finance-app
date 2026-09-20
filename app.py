@@ -107,7 +107,8 @@ elif menu == "📝 Daily Data Entry":
     all_accounts = accounts_df["name"].tolist()
     all_debts = debts_df["person_or_card"].tolist()
 
-    with st.form("entry_form"):
+    # FIX: clear_on_submit=True is added here inside st.form()
+    with st.form("entry_form", clear_on_submit=True):
         log_date = st.date_input("Date", date.today())
         trans_type = st.selectbox(
             "Transaction Type",
@@ -133,6 +134,7 @@ elif menu == "📝 Daily Data Entry":
         amount = st.number_input("Amount (₹)", min_value=1.0, step=100.0)
         notes = st.text_input("Notes (e.g., Daily Jar Gold, Netflix, SIP)")
 
+        # FIX: Standard form submit button without extra parameters
         submitted = st.form_submit_button("Submit Entry")
 
         if submitted:
@@ -204,8 +206,6 @@ elif menu == "📝 Daily Data Entry":
                     conn.update(worksheet="accounts", data=accounts_df)
 
             st.success("Transaction recorded and Google Sheets updated!")
-            st.rerun()
-
 # ---------------------------------------------------------
 # 3. DEBTS & RECEIVABLES
 # ---------------------------------------------------------
