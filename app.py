@@ -391,6 +391,39 @@ elif menu == "🍕 Split Bill":
                             }
                         )
                         log_id += 1
+                        if friend in debts_df["person_or_card"].values:
+                            d_idx = debts_df[
+                                debts_df["person_or_card"] == friend
+                            ].index[0]
+                            category = debts_df.at[d_idx, "category"]
+                            curr_amt = float(debts_df.at[d_idx, "amount"])
+
+                            if category == "Peer Receivable (Owes You)":
+                                debts_df.at[d_idx, "amount"] = (
+                                    curr_amt + f_amount
+                                )
+                            elif category == "Peer Payable (You Owe)":
+                                net_amt = curr_amt - f_amount
+                                if net_amt < 0:
+                                    debts_df.at[d_idx, "category"] = (
+                                        "Peer Receivable (Owes You)"
+                                    )
+                                    debts_df.at[d_idx, "amount"] = abs(net_amt)
+                                else:
+                                    debts_df.at[d_idx, "amount"] = net_amt
+                        else:
+                            new_debt_row = pd.DataFrame(
+                                [
+                                    {
+                                        "person_or_card": friend,
+                                        "category": "Peer Receivable (Owes You)",
+                                        "amount": f_amount,
+                                    }
+                                ]
+                            )
+                            debts_df = pd.concat(
+                                [debts_df, new_debt_row], ignore_index=True
+                            )
 
                         if friend in debts_df["person_or_card"].values:
                             d_idx = debts_df[
